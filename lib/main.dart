@@ -1,18 +1,14 @@
 import 'dart:async';
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
+import 'package:conundrum_crush/wordDatabaseHelper.dart';
 import 'package:flutter/material.dart';
 
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+import 'word.dart';
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-
-  Future<Database> _wordsDatabase;
 
   // This widget is the root of your application.
   @override
@@ -37,31 +33,53 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
 
-  void _incrementCounter() {
+  List<Word> _currentWord;
+  String _currentDisplay = 'YXGLAA';
+
+  List<Word> _nextWord;
+  bool _nextWordReady = false;
+
+  // Prepares the next word.
+  void newWord() async {
+    _nextWordReady = false;
+    WordDatabaseHelper dbHelper = new WordDatabaseHelper();
+    _nextWord = await dbHelper.getWordandAlts(7); //TODO
+    _nextWordReady = true;
+  }
+
+  void newTurn() {
+    while (!_nextWordReady) {} // find nicer way to do this
+
+    _currentWord = _nextWord;
+    //beware of null
+    if (_currentWord == null) {
+      print('No words found. Aborting!');
+      return;
+    }
+    print('Debug statement to show currentword is passing')
     setState(() {
-      _counter++;
+      _currentDisplay = _currentWord[0].display();
     });
+
+    //prepare next word
+    newWord(); //TODO check this actually is async
   }
 
   @override
   Widget build(BuildContext context) {
+    newTurn();
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Center(
         child: Column(
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 100,),
             Text(
-              'YGAXLA',
+              _currentDisplay,
               style: TextStyle(
                 fontSize: 40,
                 fontFamily: 'Raleway',
@@ -90,13 +108,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               color: Colors.lightBlueAccent,
               textColor: Colors.black,
-              onPressed: _incrementCounter,
+              onPressed: null,
             )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: null,
         tooltip: 'Give Up',
         child: Icon(Icons.eject),
       ),

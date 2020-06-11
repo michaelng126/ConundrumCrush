@@ -26,7 +26,7 @@ class WordDatabaseHelper {
     Database _database;
     Context _context;
 
-    WordDatabaseHelper(Context context) {
+    WordDatabaseHelper() {
       setupDatabase();
     }
 
@@ -60,13 +60,13 @@ class WordDatabaseHelper {
     /// @param length Length of the word
     /// @return Random word from the database.
     /// @description Beware of the null; must handle it carefully!
-    Future<List<Word>> getWordandAlts(int length, String difficulty) async {
+    Future<List<Word>> getWordandAlts(int length) async {
       Database db = this._database;
 
       List<Map<String, dynamic>> maps = await db.query(
         _DB_TABLE_WORDS,
         columns: [_WORDS_WORD,_WORDS_ID],
-        where: '$_WORDS_LENGTH = $length AND $difficulty',
+        where: '$_WORDS_LENGTH = $length', // AND $difficulty',
       );
 
       // intended behaviour to repeat if not enough words

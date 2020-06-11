@@ -28,4 +28,8 @@ class Word {
 
     return a.join('');
   }
+
+  String display() {
+    return word.toUpperCase();
+  }
 }
