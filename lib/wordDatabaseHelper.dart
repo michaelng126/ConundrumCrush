@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
 
@@ -56,7 +57,10 @@ class WordDatabaseHelper {
       this._database = await openDatabase(path, readOnly: true);
     }
 
-    List<Word> getWord (int number, int length) async {
+    /// @param number Number of words to return
+    /// @param length Length of each word
+    /// @return Words as Words from the database
+    List<Word> getWords (int number, int length) async {
       List<Word> returning = new List<Word>(number);
       Database db = this._database;
 
@@ -67,7 +71,15 @@ class WordDatabaseHelper {
         whereArgs: [length]
       );
 
-      // TODO
+      List<Word> wordData = List.generate(maps.length, (index) {
+        return Word(maps[index][_WORDS_WORD]);
+      });
+
+      // intended behaviour to repeat if not enough words
+      final _random = new Random();
+      for (var i = 0; i < number; i++) {
+        returning[i] = wordData[_random.nextInt(wordData.length)];
+      }
 
     }
 

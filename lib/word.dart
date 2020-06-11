@@ -1,16 +1,14 @@
 import 'dart:math';
 
 class Word {
-  String _word;
+  final String word;
 
-  Word(String word) {
-    this._word = word;
-  }
+  Word(this.word);
 
   String scramble() {
     Random r = new Random();
     // Convert your string into a simple char array:
-    List<String> a = _word.split('');
+    List<String> a = word.split('');
 
     // Scramble the letters using the standard Fisher-Yates shuffle
     // Modify slightly by making first letter not first letter!
