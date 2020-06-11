@@ -57,35 +57,40 @@ class WordDatabaseHelper {
       this._database = await openDatabase(path, readOnly: true);
     }
 
-    /// @param number Number of words to return
-    /// @param length Length of each word
-    /// @return Words as Words from the database
-    List<Word> getWords (int number, int length) async {
-      List<Word> returning = new List<Word>(number);
+    /// @param length Length of the word
+    /// @return Random word from the database.
+    /// @description Beware of the null; must handle it carefully!
+    Future<List<Word>> getWordandAlts(int length, String difficulty) async {
       Database db = this._database;
 
       List<Map<String, dynamic>> maps = await db.query(
         _DB_TABLE_WORDS,
         columns: [_WORDS_WORD,_WORDS_ID],
-        where: '$_WORDS_LENGTH = ?',
-        whereArgs: [length]
+        where: '$_WORDS_LENGTH = $length AND $difficulty',
       );
-
-      List<Word> wordData = List.generate(maps.length, (index) {
-        return Word(maps[index][_WORDS_WORD]);
-      });
 
       // intended behaviour to repeat if not enough words
       final _random = new Random();
-      for (var i = 0; i < number; i++) {
-        returning[i] = wordData[_random.nextInt(wordData.length)];
-      }
+      final _randInt = _random.nextInt(maps.length);
+      print('Test query') //TODO
+      Word word = Word(maps[_randInt][_WORDS_WORD]);
+      int wordId = maps[_randInt][_WORDS_ID];
+      print('Successfully CAST. Maps happy.'); //TODO
 
+      return getAlternatives(word, wordId);
     }
 
+    /// @param id Id of the word in the words table
+    /// @return alternatives of the word found at id, first word being the original.
+    Future<List<Word>> getAlternatives(Word word, int id) async {
+        Database db = this._database;
+        String query = "SELECT $_DB_TABLE_WORDS.$_WORDS_WORD FROM $_DB_TABLE_ANAGRAM LEFT JOIN $_DB_TABLE_WORDS ON $_DB_TABLE_ANAGRAM.$_ANAGRAM_WORD2ID=$_DB_TABLE_WORDS.$_WORDS_ID WHERE $_DB_TABLE_ANAGRAM.$_ANAGRAM_WORD1ID=$id";
 
-    List<Word> getWordandAlts(int length, String difficulty) {
+        List<Map<String,dynamic>> maps = await db.rawQuery(query);
+        List<Word> altWords = List.generate(maps.length, (index) => Word(maps[index][_WORDS_WORD]));
 
+        altWords.insert(0, word);
+        return altWords;
     }
 }
 
