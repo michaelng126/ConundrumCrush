@@ -37,9 +37,33 @@ class _MyHomePageState extends State<MyHomePage> {
   WordDatabaseHelper dbHelper;
   List<Word> _currentWord;
   String _currentDisplay = 'YXGLAA';
+  bool _currentWordReady = false;
 
   List<Word> _nextWord;
   bool _nextWordReady = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    dbHelper = WordDatabaseHelper.wordDbHelper;
+    firstWord().then((wordList){
+      _currentWordReady = true;
+      if (wordList == null) {
+        print('No words found. Aborting!');
+      } else {
+        setState(() {
+          String solution = wordList[0].toString();
+          print('WORD FOUND! $solution');
+          this._currentDisplay = wordList[0].displayScrambled();
+        });
+      }
+    });
+  }
+
+  Future<List<Word>> firstWord() async {
+    return await dbHelper.getWordandAlts(7);
+  }
 
   // Prepares the next word.
   void newWord() async {
@@ -48,8 +72,9 @@ class _MyHomePageState extends State<MyHomePage> {
     _nextWordReady = true;
   }
 
-  void newTurn() {
-    while (!_nextWordReady) {} // find nicer way to do this
+  void newTurn() async {
+    _nextWord = await dbHelper.getWordandAlts(7);
+    _currentWordReady = _nextWordReady;
 
     _currentWord = _nextWord;
     //beware of null
@@ -59,68 +84,72 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     print('Debug statement to show currentword is passing');
     setState(() {
-      _currentDisplay = _currentWord[0].display();
+      _currentDisplay = _currentWord[0].displayScrambled();
     });
 
     //prepare next word
-    newWord(); //TODO check this actually is async
+    //newWord(); //TODO check this actually is async
   }
 
   @override
   Widget build(BuildContext context) {
-    dbHelper = new WordDatabaseHelper();
-    dbHelper.setupDatabase();
-    newWord(); // might need to change this for screen rotation
-    newTurn();
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 100,),
-            Text(
-              _currentDisplay,
-              style: TextStyle(
-                fontSize: 40,
-                fontFamily: 'Raleway',
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              width: 250.0,
-              child:TextField(
-                  decoration: InputDecoration(
-                  //border: OutlineInputBorder(),
-                  labelText: 'Answer'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Raleway',
-                  ),
-              ),
-            ),
-            SizedBox(height: 20,),
-            RaisedButton(
-              child: new Text('Give Up',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Raleway',
-                  ),
-                ),
-              color: Colors.lightBlueAccent,
-              textColor: Colors.black,
-              onPressed: null,
-            )
-          ],
+    if (_currentWordReady) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: null,
-        tooltip: 'Give Up',
-        child: Icon(Icons.eject),
-      ),
-    );
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              SizedBox(height: 100,),
+              Text(
+                _currentDisplay,
+                style: TextStyle(
+                  fontSize: 40,
+                  fontFamily: 'Raleway',
+                ),
+              ),
+              SizedBox(height: 20,),
+              Container(
+                width: 250.0,
+                child:TextField(
+                    decoration: InputDecoration(
+                    //border: OutlineInputBorder(),
+                    labelText: 'Answer'),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Raleway',
+                    ),
+                ),
+              ),
+              SizedBox(height: 20,),
+              RaisedButton(
+                child: new Text('Give Up',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Raleway',
+                    ),
+                  ),
+                color: Colors.lightBlueAccent,
+                textColor: Colors.black,
+                onPressed: null,
+              )
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: null,
+          tooltip: 'Give Up',
+          child: Icon(Icons.eject),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+      );
+    }
+
   }
 }

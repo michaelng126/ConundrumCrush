@@ -29,7 +29,12 @@ class Word {
     return a.join('');
   }
 
-  String display() {
-    return word.toUpperCase();
+  @override
+  String toString() {
+    return this.word;
+  }
+
+  String displayScrambled() {
+    return this.scramble().toUpperCase();
   }
 }
