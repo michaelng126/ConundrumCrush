@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
@@ -27,12 +28,14 @@ class WordDatabaseHelper {
     Context _context;
 
     WordDatabaseHelper() {
-      setupDatabase();
+
     }
 
-    void setupDatabase() async {
+    Future setupDatabase() async {
       var databasesPath = await getDatabasesPath();
+      print('Hello');
       var path = join(databasesPath, "words.db");
+      print('done');
       var exists = await databaseExists(path);
 
       if (!exists) {
@@ -72,7 +75,7 @@ class WordDatabaseHelper {
       // intended behaviour to repeat if not enough words
       final _random = new Random();
       final _randInt = _random.nextInt(maps.length);
-      print('Test query') //TODO
+      print('Test query'); //TODO
       Word word = Word(maps[_randInt][_WORDS_WORD]);
       int wordId = maps[_randInt][_WORDS_ID];
       print('Successfully CAST. Maps happy.'); //TODO

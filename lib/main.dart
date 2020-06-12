@@ -34,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  WordDatabaseHelper dbHelper;
   List<Word> _currentWord;
   String _currentDisplay = 'YXGLAA';
 
@@ -43,7 +44,6 @@ class _MyHomePageState extends State<MyHomePage> {
   // Prepares the next word.
   void newWord() async {
     _nextWordReady = false;
-    WordDatabaseHelper dbHelper = new WordDatabaseHelper();
     _nextWord = await dbHelper.getWordandAlts(7); //TODO
     _nextWordReady = true;
   }
@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       print('No words found. Aborting!');
       return;
     }
-    print('Debug statement to show currentword is passing')
+    print('Debug statement to show currentword is passing');
     setState(() {
       _currentDisplay = _currentWord[0].display();
     });
@@ -68,6 +68,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    dbHelper = new WordDatabaseHelper();
+    dbHelper.setupDatabase();
+    newWord(); // might need to change this for screen rotation
     newTurn();
 
     return Scaffold(
