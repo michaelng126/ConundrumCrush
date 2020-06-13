@@ -1,17 +1,21 @@
-# conundrum_crush
+# Conundrum Crush
 
-A new Flutter project.
+Conundrum Crush is a conundrum solving game app for Android and iOS.
 
-## Getting Started
+The player tries to unscramble anagrams as quickly as possible, with the purpose of leveling up to become a 'Conundrum Master'. 
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+(note: this is the initial prototype for portfolio purposes. The full repo remains private.)
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## Development
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# conundrum-crush
+Conundrum Crush was developed with Google Flutter, a competitor of React Native - cross-platform app development frameworks. Flutter is based off Dart, which is similar to Java. My setup was VSCode and Terminal (lightweight).
+
+### Selecting Words based on Google Frequency
+
+I used SQLite to store the word list in a database. This list was then joined with word frequency from Google WordRank data. This allows inherent 'difficulty' based on how common the word is.
+
+### Adding Definitions using the ENABLE API
+
+Adding definitions for the words was a heavily requested feature. I implemented this using the public online dictionary API 'ENABLE'.
+
