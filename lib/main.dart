@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<Word>> newWord() async {
-    return await dbHelper.getWordandAlts(7);
+    return await dbHelper.getWordandAlts(8);
   }
 
   void newTurn() async {

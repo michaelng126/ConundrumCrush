@@ -70,7 +70,7 @@ class WordDatabaseHelper {
     List<Map<String, dynamic>> maps = await db.query(
       _DB_TABLE_WORDS,
       columns: [_WORDS_WORD,_WORDS_ID],
-      where: '$_WORDS_LENGTH = $length', // AND $difficulty',
+      where: '$_WORDS_LENGTH = $length AND $_WORDS_FREQUENCY < 10000', // AND $difficulty',
     );
 
     // intended behaviour to repeat if not enough words
