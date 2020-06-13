@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     bool correct = false;
     for (var word in _currentWord) {
-      if (word.toString().toLowerCase() == text.toLowerCase()) {
+      if (word.toString().toLowerCase() == text.trim().toLowerCase()) {
         correct = true;
         break;
       }
