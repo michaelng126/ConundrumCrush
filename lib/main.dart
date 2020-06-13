@@ -33,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   WordDatabaseHelper dbHelper;
+
   List<Word> _currentWord;
   String _currentDisplay = 'YXGLAA';
   bool _currentWordReady = false;
@@ -40,7 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Word> _nextWord;
   bool _nextWordReady = false;
 
+  bool _altAnswerVisible = false;
+  String _altAnswerDisplay = '';
   Color displayTextColor = Colors.black;
+
+  bool givenUp = false;
+
+  var _answerTextFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -55,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<List<Word>> newWord() async {
-    return await dbHelper.getWordandAlts(9);
+    return await dbHelper.getWordandAlts(7);
   }
 
   void newTurn() async {
@@ -64,7 +71,10 @@ class _MyHomePageState extends State<MyHomePage> {
     if (_currentWordReady) {
       // actually start turn
       _currentWord = _nextWord;
+      _answerTextFieldController.clear();
       displayTextColor = Colors.black;
+      _altAnswerVisible = false;
+      givenUp = false;
 
       if (_currentWord == null) {
         _currentWord = [Word('No words :(')]; // TODO hack for no words
@@ -90,7 +100,23 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  String altAnswerString(List<Word> wordList) {
+    String answerString = '';
+    bool firstWord = true; // first word is not alternative
+    for (var word in wordList) {
+      if (firstWord) {
+        firstWord = false;
+      } else {
+        answerString += ' or ' + word.toString();
+      }
+    }
+
+    return answerString;
+  }
+
   void verifyAnswer(String text) {
+    if (givenUp) {return;}
+
     bool correct = false;
     for (var word in _currentWord) {
       if (word.toString().toLowerCase() == text.toLowerCase()) {
@@ -101,14 +127,18 @@ class _MyHomePageState extends State<MyHomePage> {
     if (correct) {
       setState(() {
         displayTextColor = Colors.green;
+        giveUp();
       });
     }
-
   }
 
   void giveUp() {
+    givenUp = true;
+
     setState(() {
       _currentDisplay = _currentWord[0].toString().toUpperCase();
+      _altAnswerDisplay = altAnswerString(_currentWord);
+      _altAnswerVisible = !(_altAnswerDisplay == '');
     });
   }
 
@@ -127,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               Text(
                 _currentDisplay,
+
                 style: TextStyle(
                   fontSize: 40,
                   fontFamily: 'Raleway',
@@ -134,11 +165,26 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               SizedBox(
-                height: 20,
+                height: 2,
+              ),
+              Visibility(
+                visible: _altAnswerVisible,
+                child: Text(
+                  _altAnswerDisplay,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontFamily: 'Raleway',
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 10,
               ),
               Container(
                 width: 250.0,
                 child: TextField(
+                  controller: _answerTextFieldController,
                   onChanged: verifyAnswer,
                   decoration: InputDecoration(
                       //border: OutlineInputBorder(),
@@ -162,7 +208,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 color: Colors.red,
                 textColor: Colors.white,
-                onPressed: giveUp,
+                onPressed: givenUp ? null : giveUp,
               )
             ],
           ),
@@ -170,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
         floatingActionButton: FloatingActionButton(
           onPressed: newTurn,
           tooltip: 'Give Up',
-          child: Icon(Icons.eject),
+          child: Icon(Icons.arrow_forward_ios),
         ),
       );
     } else {
