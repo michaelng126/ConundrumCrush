@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:math';
+import 'package:conundrum_crush/animatedWave.dart';
 import 'package:conundrum_crush/wordDatabaseHelper.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool _altAnswerVisible = false;
   String _altAnswerDisplay = '';
-  Color displayTextColor = Colors.black;
+  Color displayTextColor = Colors.white;
 
   bool givenUp = false;
 
@@ -72,7 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // actually start turn
       _currentWord = _nextWord;
       _answerTextFieldController.clear();
-      displayTextColor = Colors.black;
+      displayTextColor = Colors.white;
       _altAnswerVisible = false;
       givenUp = false;
 
@@ -145,79 +147,101 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     if (_currentWordReady) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.title),
-        ),
-        body: Center(
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 100,
+      return Stack(
+        children: <Widget>[
+          Positioned.fill(child: AnimatedBackground()),
+          onBottom(AnimatedWave(
+            height: 180,
+            speed: 1.0,
+          )),
+          onBottom(AnimatedWave(
+            height: 120,
+            speed: 0.9,
+            offset: pi,
+          )),
+          onBottom(AnimatedWave(
+            height: 220,
+            speed: 1.2,
+            offset: pi / 2,
+          )),
+          Positioned.fill(child: Scaffold(
+              backgroundColor: Colors.transparent,
+              appBar: AppBar(
+                title: Text(widget.title),
               ),
-              Text(
-                _currentDisplay,
-
-                style: TextStyle(
-                  fontSize: 40,
-                  fontFamily: 'Raleway',
-                  color: displayTextColor,
+              body:
+              Center(
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(
+                      height: 100,
+                    ),
+                    Text(
+                      _currentDisplay,
+                      style: TextStyle(
+                        fontSize: 40,
+                        fontFamily: 'Raleway',
+                        color: displayTextColor,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Visibility(
+                      visible: _altAnswerVisible,
+                      child: Text(
+                        _altAnswerDisplay,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Raleway',
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Container(
+                      width: 250.0,
+                      child: TextField(
+                        controller: _answerTextFieldController,
+                        onChanged: verifyAnswer,
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Answer'),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Raleway',
+                          color: Colors.white,
+                          decorationColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    RaisedButton(
+                      child: new Text(
+                        'Give Up',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'Raleway',
+                        ),
+                      ),
+                      color: Colors.red,
+                      textColor: Colors.white,
+                      onPressed: givenUp ? null : giveUp,
+                    )
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 2,
+              floatingActionButton: FloatingActionButton(
+                onPressed: newTurn,
+                tooltip: 'Give Up',
+                child: Icon(Icons.arrow_forward_ios),
               ),
-              Visibility(
-                visible: _altAnswerVisible,
-                child: Text(
-                  _altAnswerDisplay,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: 'Raleway',
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Container(
-                width: 250.0,
-                child: TextField(
-                  controller: _answerTextFieldController,
-                  onChanged: verifyAnswer,
-                  decoration: InputDecoration(
-                      //border: OutlineInputBorder(),
-                      labelText: 'Answer'),
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Raleway',
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              RaisedButton(
-                child: new Text(
-                  'Give Up',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Raleway',
-                  ),
-                ),
-                color: Colors.red,
-                textColor: Colors.white,
-                onPressed: givenUp ? null : giveUp,
-              )
-            ],
+            ),
           ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: newTurn,
-          tooltip: 'Give Up',
-          child: Icon(Icons.arrow_forward_ios),
-        ),
+        ],
       );
     } else {
       return Scaffold(
@@ -227,4 +251,11 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
   }
+
+  onBottom(Widget child) => Positioned.fill(
+    child: Align(
+      alignment: Alignment.bottomCenter,
+      child: child,
+    ),
+  );
 }
