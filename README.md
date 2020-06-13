@@ -4,6 +4,7 @@ Conundrum Crush is a conundrum solving game app for Android and iOS.
 
 The player tries to unscramble anagrams as quickly as possible, with the purpose of leveling up to become a 'Conundrum Master'. 
 
+<img src="screenshots/screenshot1.jpg" width="250"/> <img src="screenshots/screenshot2.jpg" width="250"/> <img src="screenshots/screenshot3.jpg" width="250"/>
 
 (note: this is the initial prototype for portfolio purposes. The full repo remains private.)
 
